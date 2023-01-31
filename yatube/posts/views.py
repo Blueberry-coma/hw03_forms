@@ -9,8 +9,6 @@ NUM_POST = 10
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = Post.objects.select_related().filter(
-        group=group).order_by('pub_date')[:NUM_POST]
     post_list = Post.objects.all().filter(
         group=group).order_by('pub_date')
     paginator = Paginator(post_list, NUM_POST)
@@ -24,7 +22,6 @@ def group_posts(request, slug):
 
 
 def index(request):
-    posts = Post.objects.select_related().order_by('-pub_date')[:NUM_POST]
     post_list = Post.objects.all().order_by('-pub_date')
     paginator = Paginator(post_list, NUM_POST)
     page_number = request.GET.get('page')
@@ -55,7 +52,7 @@ def post_detail(request, post_id):
     context = {
         'post': post,
     }
-    return render(request, 'posts/post_detail.html', context) 
+    return render(request, 'posts/post_detail.html', context)
 
 
 @login_required()
@@ -67,6 +64,7 @@ def post_create(request):
         form.save()
         return redirect('posts:profile', form.author.username)
     return render(request, 'posts/create_post.html', {'form': form})
+
 
 @login_required()
 def post_edit(request, post_id):
