@@ -5,7 +5,6 @@ from .forms import PostForm
 from .utils import pagination
 
 
-
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = Post.objects.all().filter(
@@ -30,9 +29,7 @@ def index(request):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
-    paginator = Paginator(post_list, NUM_POST)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = pagination(request, post_list)
     context = {
         'author': author,
         'page_obj': page_obj,
