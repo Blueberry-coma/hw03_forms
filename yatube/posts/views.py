@@ -1,19 +1,16 @@
-from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Post, Group, User
 from .forms import PostForm
+from .utils import pagination
 
-NUM_POST = 10
 
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     post_list = Post.objects.all().filter(
         group=group).order_by('pub_date')
-    paginator = Paginator(post_list, NUM_POST)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = pagination(request, post_list)
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -23,13 +20,9 @@ def group_posts(request, slug):
 
 def index(request):
     post_list = Post.objects.all().order_by('-pub_date')
-    paginator = Paginator(post_list, NUM_POST)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    title = 'Последние обновления на сайте'
+    page_obj = pagination(request, post_list)
     context = {
         'page_obj': page_obj,
-        'title': title,
     }
     return render(request, 'posts/index.html', context)
 
